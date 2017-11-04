@@ -3,10 +3,6 @@
 #include<string.h>
 #include<time.h>
 
-typedef struct _in{
-	char op, word[50], def[140];
-}in;
-
 typedef struct _node{
 	char word[50], def[140];
 	struct _node *l, *u, *d, *r;
