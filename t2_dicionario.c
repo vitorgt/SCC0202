@@ -30,6 +30,18 @@ void printSL(node *high, int lvl){
 	node *a = high;
 	printf("%d\n", lvl);
 	while(a != NULL){
+	printf("\t%s\n%s\t%s\t%s\n\t%s\n", 
+			((a->u->word != NULL) && (a->u->word[0] != '\0')) ? a->u->word : "(nil)", 
+			((a->l->word != NULL) && (a->l->word[0] != '\0')) ? a->l->word : "(nil)", 
+			((a->word != NULL) && (a->word[0] != '\0')) ? a->word : "(nil)", 
+			((a->r->word != NULL) && (a->r->word[0] != '\0')) ? a->r->word : "(nil)", 
+			((a->d->word != NULL) && (a->d->word[0] != '\0')) ? a->d->word : "(nil)");
+		a = a->r;
+	}
+	printf("\n");
+	a = high;
+	printf("%d\n", lvl);
+	while(a != NULL){
 		printf("|%s|", a->word);
 		a = a->r;
 	}
@@ -38,18 +50,31 @@ void printSL(node *high, int lvl){
 		printSL(high->d, ++lvl);
 }
 
+void printxSL(node *high, int lvl){
+	node *a = high;
+	printf("%d\n", lvl);
+	while(a != NULL){
+		printf("|%p(%s)|", (void *)a, a->word);
+		a = a->r;
+	}
+		printf("|%p(%s)|", (void *)a, a->word);
+	printf("\n");
+	if(high->d != NULL)
+		printxSL(high->d, ++lvl);
+}
+
 node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
 	printf("%p\n", (void *)high);
 	printf("%s\n", word);
 	printf("%s\n", high->word);
-
+/*
 	printf("\t%s\n%s\t%s\t%s\n\t%s\n", 
 			((high->u->word != NULL) && (high->u->word[0] != '\0')) ? high->u->word : "(nil)", 
 			((high->l->word != NULL) && (high->l->word[0] != '\0')) ? high->l->word : "(nil)", 
 			((high->word != NULL) && (high->word[0] != '\0')) ? high->word : "(nil)", 
 			((high->r->word != NULL) && (high->r->word[0] != '\0')) ? high->r->word : "(nil)", 
 			((high->d->word != NULL) && (high->d->word[0] != '\0')) ? high->d->word : "(nil)");
-
+*/
 	printf("act%d max%d str%d\n", lvl, maxlvlcreated, strcmp(high->word, word));
 	if((strcmp(high->word, word) == 0) && (lvl == maxlvlcreated)){
 		printf("a\n");
@@ -61,14 +86,14 @@ node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
 	}
 
 	else if((strcmp(high->word, word) < 0) && (high->r != NULL)){//a, b
-		if((strcmp(high->r->word, word) < 0)){
+		//if((strcmp(high->r->word, word) < 0)){
 			printf("c\n");
 			return searchSL(high->r, word, lvl, maxlvlcreated);
-		}
+		/*}
 		else{
 			printf("k\n");
 			return high;
-		}
+		}*/
 	}
 	else if((strcmp(high->word, word) < 0) && (lvl != maxlvlcreated) && (high->r == NULL)){
 		printf("d\n");
@@ -81,6 +106,7 @@ node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
 
 	else if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] != '\0')){//b, a
 		printf("f\n");
+		printf("deb%p %s\n%p %s", (void *)high->l, high->l->word, (void *)high->l->d, high->l->d->word);
 		return searchSL(high->l->d, word, ++lvl, maxlvlcreated);
 	}
 	else if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] == '\0')){
@@ -134,8 +160,9 @@ void insertSL(node **high, char word[50], char def[140], int *maxlvlcreated){
 				printf("i%d m%d\n", i, *maxlvlcreated);
 				a = searchSL(*high, word, 0, (*maxlvlcreated - i));
 				b = searchSL(*high, word, 0, (*maxlvlcreated - i + 1));
-				printf("aretornou|%s|\n", a->word);
-				printf("bretornou|%s|\n", b->word);
+				printxSL(*high, 0);
+				printf("aretornou|%p(%s)|\n", (void*)a, a->word);
+				printf("bretornou|%p(%s)|\n", (void*)b, b->word);
 				node *newa;
 				newa = (node *)malloc(sizeof(node));
 				clearNode(newa);
@@ -147,7 +174,7 @@ void insertSL(node **high, char word[50], char def[140], int *maxlvlcreated){
 				newa->d = b;
 				b->u = newa;
 				if(newa->r != NULL)
-					newa->r->l = newn;
+					newa->r->l = newa;
 				printSL(*high, 0);
 			}
 			else
@@ -178,6 +205,7 @@ int main(){
 	srand((unsigned)time(&t));
 
 	while((c = getchar())){
+		printxSL(high, 0);
 		if(c == EOF || c == '\n'){
 			if(spc == 1){
 				strcpy(word, buffer);
