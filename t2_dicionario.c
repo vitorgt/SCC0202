@@ -55,37 +55,43 @@ node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
 		printf("a\n");
 		return high;
 	}
-	if((strcmp(high->word, word) == 0) && (lvl != maxlvlcreated)){
+	else if((strcmp(high->word, word) == 0) && (lvl != maxlvlcreated)){
 		printf("b\n");
 		return searchSL(high->d, word, ++lvl, maxlvlcreated);
 	}
 
-	if((strcmp(high->word, word) < 0) && (high->r != NULL)){//a, b
-		printf("c\n");
-		return searchSL(high->r, word, lvl, maxlvlcreated);
+	else if((strcmp(high->word, word) < 0) && (high->r != NULL)){//a, b
+		if((strcmp(high->r->word, word) < 0)){
+			printf("c\n");
+			return searchSL(high->r, word, lvl, maxlvlcreated);
+		}
+		else{
+			printf("k\n");
+			return high;
+		}
 	}
-	if((strcmp(high->word, word) < 0) && (lvl != maxlvlcreated) && (high->r == NULL)){
+	else if((strcmp(high->word, word) < 0) && (lvl != maxlvlcreated) && (high->r == NULL)){
 		printf("d\n");
 		return searchSL(high->d, word, ++lvl, maxlvlcreated);
 	}
-	if((strcmp(high->word, word) < 0) && (lvl == maxlvlcreated) && (high->r == NULL)){
+	else if((strcmp(high->word, word) < 0) && (lvl == maxlvlcreated) && (high->r == NULL)){
 		printf("e\n");
 		return high;
 	}
 
-	if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] != '\0')){//b, a
+	else if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] != '\0')){//b, a
 		printf("f\n");
 		return searchSL(high->l->d, word, ++lvl, maxlvlcreated);
 	}
-	if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] == '\0')){
+	else if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] == '\0')){
 		printf("g\n");
 		return searchSL(high->d, word, ++lvl, maxlvlcreated);
 	}
-	if((strcmp(high->word, word) > 0) && (lvl == maxlvlcreated) && (high->l->word[0] != '\0')){
+	else if((strcmp(high->word, word) > 0) && (lvl == maxlvlcreated) && (high->l->word[0] != '\0')){
 		printf("h\n");
 		return searchSL(high->l, word, lvl, maxlvlcreated);
 	}
-	if((strcmp(high->word, word) > 0) && (lvl == maxlvlcreated) && (high->l->word[0] == '\0')){
+	else if((strcmp(high->word, word) > 0) && (lvl == maxlvlcreated) && (high->l->word[0] == '\0')){
 		printf("j\n");
 		return high->l;
 	}
