@@ -26,44 +26,7 @@ void clearNode(node *n){
 	n->r = NULL;
 }
 
-void printSL(node *high, int lvl){
-	node *a = high;
-	printf("%d\n", lvl);
-	while(a != NULL){
-		printf("\t%s\n%s\t%s\t%s\n\t%s\n", 
-				((a->u->word != NULL) && (a->u->word[0] != '\0')) ? a->u->word : "(nil)", 
-				((a->l->word != NULL) && (a->l->word[0] != '\0')) ? a->l->word : "(nil)", 
-				((a->word != NULL) && (a->word[0] != '\0')) ? a->word : "(nil)", 
-				((a->r->word != NULL) && (a->r->word[0] != '\0')) ? a->r->word : "(nil)", 
-				((a->d->word != NULL) && (a->d->word[0] != '\0')) ? a->d->word : "(nil)");
-		a = a->r;
-	}
-	printf("\n");
-	a = high;
-	printf("%d\n", lvl);
-	while(a != NULL){
-		printf("|%s|", a->word);
-		a = a->r;
-	}
-	printf("\n");
-	if(high->d != NULL)
-		printSL(high->d, ++lvl);
-}
-
-void printxSL(node *high, int lvl){
-	node *a = high;
-	printf("%d\n", lvl);
-	while(a != NULL){
-		printf("|%p(%s)|", (void *)a, a->word);
-		a = a->r;
-	}
-	printf("|%p(%s)|", (void *)a, a->word);
-	printf("\n");
-	if(high->d != NULL)
-		printxSL(high->d, ++lvl);
-}
-
-void criaacimaSL(node **high, int *maxlvlcreated){
+void createaboveSL(node **high, int *maxlvlcreated){
 	node *newzero;
 	newzero = (node *)malloc(sizeof(node));
 	clearNode(newzero);
@@ -85,13 +48,11 @@ void deleteSL(node *high){
 }
 
 node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
-	//	printf("a|%p|\n", (void*)high);
 	if(strcmp(high->word, word) == 0)//a, a
 		if(lvl != maxlvlcreated)
 			return searchSL(high->d, word, ++lvl, maxlvlcreated);
-		else{
-			//			printf("b|%p|\n", (void*)high);
-			return high;}
+		else
+			return high;
 
 	else if(strcmp(high->word, word) < 0)//a, b
 		if(high->r != NULL)
@@ -99,70 +60,52 @@ node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
 		else
 			if(lvl != maxlvlcreated)
 				return searchSL(high->d, word, ++lvl, maxlvlcreated);
-			else{
-				//				printf("c|%p|\n", (void*)high);
-				return high;}
+			else
+				return high;
 
 	else//b, a
 		if(lvl != maxlvlcreated)
 			return searchSL(high->l->d, word, ++lvl, maxlvlcreated);
-		else{
-			//			printf("d|%p|\n", (void*)high->l);
-			return high->l;}
-}
-
-void print4SL(node *a){
-	printf("|%9p|\n|%9p||%9p||%9p|\n\t   |%9p|\n",(void*)a->u, (void*)a->l, (void*)a, (void*)a->r, (void*)a->d);
+		else
+			return high->l;
 }
 
 void insertSL(node **high, char word[50], char def[140], int *maxlvlcreated){
-	node *a = searchSL(*high, word, 0, *maxlvlcreated), *debaixo;
+	int i = 0;
+	node *a = searchSL(*high, word, 0, *maxlvlcreated);
+	node *underneath;
 	if(strcmp(a->word, word) == 0)
 		printf("OPERACAO INVALIDA\n");
 	else{
-		int i = 0;
-		node *newn;
-		newn = (node *)malloc(sizeof(node));
-		clearNode(newn);
-		strcpy(newn->word, word);
-		strcpy(newn->def, def);
-		newn->l = a;
-		newn->r = a->r;
-		a->r = newn;
-		if(newn->r != NULL)
-			newn->r->l = newn;
-		debaixo = newn;
-		//		printf("debaixo    ");
-		//		print4SL(debaixo);
+		node *newbase;
+		newbase = (node *)malloc(sizeof(node));
+		clearNode(newbase);
+		strcpy(newbase->word, word);
+		strcpy(newbase->def, def);
+		newbase->l = a;
+		newbase->r = a->r;
+		a->r = newbase;
+		if(newbase->r != NULL)
+			newbase->r->l = newbase;
+		underneath = newbase;
 		for(i = 1;; i++){//aqui q eu posso limitar a quantidade de SLs "i < 7"
 			if(rand()%2){
-				//	node *b;
-				//printf("i%d m%d\n", i, *maxlvlcreated);
 				if(i > *maxlvlcreated)
-					criaacimaSL(high, maxlvlcreated);
-				//				printxSL(*high ,0);
+					createaboveSL(high, maxlvlcreated);
 				a = searchSL(*high, word, 0, (*maxlvlcreated - i));
-				//	b = searchSL(*high, word, 0, (*maxlvlcreated - i + 1));
-				//printxSL(*high, 0);
-				//printf("aretornou|%p(%s)|\n", (void*)a, a->word);
-				//printf("bretornou|%p(%s)|\n", (void*)b, b->word);
-				node *newa;
-				newa = (node *)malloc(sizeof(node));
-				clearNode(newa);
-				strcpy(newa->word, word);
-				strcpy(newa->def, def);
-				newa->l = a;
-				newa->r = a->r;
-				a->r = newa;
-				newa->d = debaixo;
-				debaixo->u = newa;
-				if(newa->r != NULL)
-					newa->r->l = newa;
-				//		printf("newa       ");
-				//				print4SL(newa);
-				//		printf("debaixo    ");
-				//		print4SL(debaixo);
-				debaixo = newa;
+				node *newabove;
+				newabove = (node *)malloc(sizeof(node));
+				clearNode(newabove);
+				strcpy(newabove->word, word);
+				strcpy(newabove->def, def);
+				newabove->l = a;
+				newabove->r = a->r;
+				a->r = newabove;
+				newabove->d = underneath;
+				underneath->u = newabove;
+				if(newabove->r != NULL)
+					newabove->r->l = newabove;
+				underneath = newabove;
 			}
 			else
 				break;
@@ -209,7 +152,7 @@ int main(){
 	char c, op, buffer[150], word[51] = {""}, def[141] = {""};
 	int spc = 0, maxlvlcreated = -1, i = 0;
 	node *high = NULL, *a;
-	criaacimaSL(&high, &maxlvlcreated);
+	createaboveSL(&high, &maxlvlcreated);
 
 	time_t t;
 	srand((unsigned)time(&t));
@@ -217,25 +160,18 @@ int main(){
 	while((c = getchar())){
 		if((c == EOF || c == '\n')){
 			if(op){
-				if(spc == 1){
+				if(spc == 1)
 					strcpy(word, buffer);
-					//printf("word %s\n", word);
-				}
 				else if(spc > 2){
 					strcat(def, " ");
 					strcat(def, buffer);
-					//printf("def %s\n", def);
 				}
-				//			printxSL(high, 0);
-				if(op == 'n'){		//iNsercao
+				if(op == 'n')		//iNsercao
 					insertSL(&high, word, def, &maxlvlcreated);
-				}
-				else if(op == 'l'){	//aLteracao
+				else if(op == 'l')	//aLteracao
 					changeSL(high, word, def, maxlvlcreated);
-				}
-				else if(op == 'e'){	//rEmocao
+				else if(op == 'e')	//rEmocao
 					removeSL(high, word, maxlvlcreated);
-				}
 				else if(op == 'u'){	//bUsca
 					a = searchSL(high, word, 0, maxlvlcreated);
 					if(strcmp(a->word, word) != 0)
@@ -268,17 +204,12 @@ int main(){
 			ungetc(c, stdin);
 		else if(c == ' '){
 			spc++;
-			if(spc == 1){
+			if(spc == 1)
 				op = buffer[1];
-				//printf("op %d\n", op);
-			}
-			else if(spc == 2){
+			else if(spc == 2)
 				strcpy(word, buffer);
-				//printf("word %s\n", word);
-			}
-			else if(spc == 3){
+			else if(spc == 3)
 				strcpy(def, buffer);
-			}
 			else{
 				strcat(def, " ");
 				strcat(def, buffer);
@@ -292,7 +223,6 @@ int main(){
 		buffer[i] = '\0';
 		ungetc(c, stdin);
 	}
-	//	printxSL(high, 0);
 	deleteSL(high);
 	return 0;
 }
