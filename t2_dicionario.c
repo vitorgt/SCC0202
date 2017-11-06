@@ -63,77 +63,6 @@ void printxSL(node *high, int lvl){
 		printxSL(high->d, ++lvl);
 }
 
-node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
-	//printf("%p\n", (void *)high);
-	//printf("%s\n", word);
-	//printf("%s\n", high->word);
-	//printf("act%d max%d str%d\n", lvl, maxlvlcreated, strcmp(high->word, word));
-	if((strcmp(high->word, word) == 0) && (lvl == maxlvlcreated)){
-		//printf("a\n");
-		return high;
-	}
-	else if((strcmp(high->word, word) == 0) && (lvl != maxlvlcreated)){
-		//printf("b\n");
-		return searchSL(high->d, word, ++lvl, maxlvlcreated);
-	}
-
-	else if((strcmp(high->word, word) < 0) && (high->r != NULL)){//a, b
-		//printf("c\n");
-		return searchSL(high->r, word, lvl, maxlvlcreated);
-	}
-	else if((strcmp(high->word, word) < 0) && (lvl != maxlvlcreated) && (high->r == NULL)){
-		//printf("d\n");
-		return searchSL(high->d, word, ++lvl, maxlvlcreated);
-	}
-	else if((strcmp(high->word, word) < 0) && (lvl == maxlvlcreated) && (high->r == NULL)){
-		//printf("e\n");
-		return high;
-	}
-
-	else if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] != '\0')){//b, a
-		//printf("f\n");
-		return searchSL(high->l->d, word, ++lvl, maxlvlcreated);
-	}
-	else if((strcmp(high->word, word) > 0) && (lvl != maxlvlcreated) && (high->l->word[0] == '\0')){
-		//printf("g\n");
-		return searchSL(high->d, word, ++lvl, maxlvlcreated);
-	}
-	else if((strcmp(high->word, word) > 0) && (lvl == maxlvlcreated) && (high->l->word[0] != '\0')){
-		if(word[1] != '\0'){
-			//printf("h\n");
-			return searchSL(high->l, word, lvl, maxlvlcreated);
-		}
-		else{
-			if(high->l->word[0] == word[0]){
-				//printf("k\n");
-				return high->l;
-			}
-			else if(high->word[0] == word[0]){
-				//printf("k\n");
-				return high;
-			}
-		}
-	}
-	else if((strcmp(high->word, word) > 0) && (lvl == maxlvlcreated) && (high->l->word[0] == '\0')){
-		if(word[1] != '\0'){
-			//printf("j\n");
-			return high->l;
-		}
-		else{
-			if(high->l->word[0] == word[0]){
-				//printf("k\n");
-				return high->l;
-			}
-			else if(high->word[0] == word[0]){
-				//printf("k\n");
-				return high;
-			}
-		}
-	}
-
-	return high;
-}
-
 void criaacimaSL(node **high, int *maxlvlcreated){
 	node *newzero;
 	newzero = (node *)malloc(sizeof(node));
@@ -141,52 +70,6 @@ void criaacimaSL(node **high, int *maxlvlcreated){
 	newzero->d = *high;
 	*high = newzero;
 	(*maxlvlcreated)++;
-}
-
-void insertSL(node **high, char word[50], char def[140], int *maxlvlcreated){
-	node *a = searchSL(*high, word, 0, *maxlvlcreated);
-	if(strcmp(a->word, word) == 0)
-		printf("OPERCAO INVALIDA\n");
-	else{
-		int i = 0;
-		node *newn;
-		newn = (node *)malloc(sizeof(node));
-		clearNode(newn);
-		strcpy(newn->word, word);
-		strcpy(newn->def, def);
-		newn->l = a;
-		newn->r = a->r;
-		a->r = newn;
-		if(newn->r != NULL)
-			newn->r->l = newn;
-		for(i = 1;; i++){//aqui q eu posso limitar a quantidade de SLs "i < 7"
-			if(rand()%2){
-				node *b;
-				//printf("i%d m%d\n", i, *maxlvlcreated);
-				if(i > *maxlvlcreated)
-					criaacimaSL(high, maxlvlcreated);
-				a = searchSL(*high, word, 0, (*maxlvlcreated - i));
-				b = searchSL(*high, word, 0, (*maxlvlcreated - i + 1));
-				//printxSL(*high, 0);
-				//printf("aretornou|%p(%s)|\n", (void*)a, a->word);
-				//printf("bretornou|%p(%s)|\n", (void*)b, b->word);
-				node *newa;
-				newa = (node *)malloc(sizeof(node));
-				clearNode(newa);
-				strcpy(newa->word, word);
-				strcpy(newa->def, def);
-				newa->l = a;
-				newa->r = a->r;
-				a->r = newa;
-				newa->d = b;
-				b->u = newa;
-				if(newa->r != NULL)
-					newa->r->l = newa;
-			}
-			else
-				break;
-		}
-	}
 }
 
 void deleteSL(node *high){
@@ -199,6 +82,92 @@ void deleteSL(node *high){
 		high = a;
 	}
 	free(high);
+}
+
+node *searchSL(node *high, char word[50], int lvl, int maxlvlcreated){
+//	printf("a|%p|\n", (void*)high);
+	if(strcmp(high->word, word) == 0)//a, a
+		if(lvl != maxlvlcreated)
+			return searchSL(high->d, word, ++lvl, maxlvlcreated);
+		else{
+//			printf("b|%p|\n", (void*)high);
+			return high;}
+
+	else if(strcmp(high->word, word) < 0)//a, b
+		if(high->r != NULL)
+			return searchSL(high->r, word, lvl, maxlvlcreated);
+		else
+			if(lvl != maxlvlcreated)
+				return searchSL(high->d, word, ++lvl, maxlvlcreated);
+			else{
+//				printf("c|%p|\n", (void*)high);
+				return high;}
+
+	else//b, a
+		if(lvl != maxlvlcreated)
+			return searchSL(high->l->d, word, ++lvl, maxlvlcreated);
+		else{
+//			printf("d|%p|\n", (void*)high->l);
+			return high->l;}
+}
+
+void print4SL(node *a){
+	printf("|%9p|\n|%9p||%9p||%9p|\n\t   |%9p|\n",(void*)a->u, (void*)a->l, (void*)a, (void*)a->r, (void*)a->d);
+}
+
+void insertSL(node **high, char word[50], char def[140], int *maxlvlcreated){
+	node *a = searchSL(*high, word, 0, *maxlvlcreated), *debaixo;
+	if(strcmp(a->word, word) == 0)
+		printf("OPERACAO INVALIDA\n");
+	else{
+		int i = 0;
+		node *newn;
+		newn = (node *)malloc(sizeof(node));
+		clearNode(newn);
+		strcpy(newn->word, word);
+		strcpy(newn->def, def);
+		newn->l = a;
+		newn->r = a->r;
+		a->r = newn;
+		if(newn->r != NULL)
+			newn->r->l = newn;
+		debaixo = newn;
+//		printf("debaixo    ");
+//		print4SL(debaixo);
+		for(i = 1;; i++){//aqui q eu posso limitar a quantidade de SLs "i < 7"
+			if(rand()%2){
+			//	node *b;
+				//printf("i%d m%d\n", i, *maxlvlcreated);
+				if(i > *maxlvlcreated)
+					criaacimaSL(high, maxlvlcreated);
+//				printxSL(*high ,0);
+				a = searchSL(*high, word, 0, (*maxlvlcreated - i));
+			//	b = searchSL(*high, word, 0, (*maxlvlcreated - i + 1));
+				//printxSL(*high, 0);
+				//printf("aretornou|%p(%s)|\n", (void*)a, a->word);
+				//printf("bretornou|%p(%s)|\n", (void*)b, b->word);
+				node *newa;
+				newa = (node *)malloc(sizeof(node));
+				clearNode(newa);
+				strcpy(newa->word, word);
+				strcpy(newa->def, def);
+				newa->l = a;
+				newa->r = a->r;
+				a->r = newa;
+				newa->d = debaixo;
+				debaixo->u = newa;
+				if(newa->r != NULL)
+					newa->r->l = newa;
+//		printf("newa       ");
+//				print4SL(newa);
+//		printf("debaixo    ");
+//		print4SL(debaixo);
+				debaixo = newa;
+			}
+			else
+				break;
+		}
+	}
 }
 
 void removeSL(node *high, char word[50], int maxlvlcreated){
@@ -218,13 +187,13 @@ void removeSL(node *high, char word[50], int maxlvlcreated){
 		free(a);
 	}
 	else
-		printf("OPERCAO INVALIDA\n");
+		printf("OPERACAO INVALIDA\n");
 }
 
 void changeSL(node *high, char word[50], char def[140], int maxlvlcreated){
 	node *a = searchSL(high, word, 0, maxlvlcreated);
 	if(strcmp(a->word, word) != 0)
-		printf("OPERCAO INVALIDA\n");
+		printf("OPERACAO INVALIDA\n");
 	else{
 		while(a->u != NULL){
 			strcpy(a->word, word);
@@ -258,6 +227,7 @@ int main(){
 				strcat(def, buffer);
 				//printf("def %s\n", def);
 			}
+//			printxSL(high, 0);
 			if(op == 'n'){		//iNsercao
 				insertSL(&high, word, def, &maxlvlcreated);
 			}
@@ -270,14 +240,15 @@ int main(){
 			else if(op == 'u'){	//bUsca
 				a = searchSL(high, word, 0, maxlvlcreated);
 				if(strcmp(a->word, word) != 0)
-					printf("OPERCAO INVALIDA\n");
+					printf("OPERACAO INVALIDA\n");
 				else
 					printf("%s %s\n", a->word, a->def);
 			}
 			else if(op == 'm'){//iMpressao
 				a = searchSL(high, word, 0, maxlvlcreated);
+				a = a->r;
 				if(a->word[0] != word[0])
-					printf("OPERCAO INVALIDA\n");
+					printf("OPERACAO INVALIDA\n");
 				else
 					while(a->word[0] == word[0]){
 						printf("%s %s\n", a->word, a->def);
@@ -285,7 +256,7 @@ int main(){
 					}
 			}
 			else{
-				printf("OPERCAO INVALIDA\n");
+				printf("OPERACAO INVALIDA\n");
 			}
 			spc = 0;
 			def[0] = '\0';
@@ -319,7 +290,7 @@ int main(){
 		buffer[i] = '\0';
 		ungetc(c, stdin);
 	}
-	//printxSL(high, 0);
+//	printxSL(high, 0);
 	deleteSL(high);
 	return 0;
 }
