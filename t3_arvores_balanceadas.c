@@ -20,6 +20,7 @@ void pred2RB(rb *a, int k, int *pred){
 	if(a->v == k)
 		if(a->l)
 			pred = maxRB(a->l);
+		else return;
 	else if(a->v > k)
 		pred2RB(a->l, k, pre);
 	else{
@@ -43,6 +44,7 @@ void succ2RB(rb *a, int k, int *succ){
 	if(a->v == k)
 		if(a->r)
 			succ = minRB(a->r);
+		else return;
 	else if(a->v > k){
 		succ = a->v;
 		succ2RB(a->l, k, succ);
