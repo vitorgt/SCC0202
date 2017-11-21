@@ -142,6 +142,20 @@ void inserBST(rb *a, rb *newn){
 			break;
 }
 
+void rroteRB(rb **a){
+	rb *b = (*a)->l;
+	(*a)->l = b->r;
+	b->r = (*a);
+	*a = b;
+}
+
+void lroteRB(rb **a){
+	rb *b = (*a)->r;
+	(*a)->r = b->l;
+	b->l = (*a);
+	*a = b;
+}
+
 void inserRB(rb **a, int k){
 	rb *newn = NULL;//, *s = *a;
 	newn = (rb *)malloc(sizeof(rb));
@@ -150,9 +164,19 @@ void inserRB(rb **a, int k){
 	newn->c = 1;
 	if(!(*a))
 		*a = newn;
-	else
+	else{
 		inserBST(*a, newn);
+	}
 	(*a)->c = 0;
+}
+
+void priall(rb *ward){
+	printRB(ward,'i');
+	printf("\n");
+	printRB(ward,'e');
+	printf("\n");
+	printRB(ward,'o');
+	printf("\n");
 }
 
 int main(){
@@ -162,6 +186,13 @@ int main(){
 	inserRB(&ward, 2);
 	inserRB(&ward, 5);
 	inserRB(&ward, 4);
+	printRB(ward,'i');
+	printf("\n");
+	printRB(ward,'e');
+	printf("\n");
+	printRB(ward,'o');
+	printf("\n");
+	rroteRB(ward->l);
 	printRB(ward,'i');
 	printf("\n");
 	printRB(ward,'e');
