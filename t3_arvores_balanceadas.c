@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
 
 typedef struct _rb{
 	int v;//value
@@ -91,32 +92,39 @@ void succ1RB(rb *a, int k){
 		printf("erro\n");
 }
 
-void printRB(rb *a, char o){
-	if(a)
+void printRB(rb *a, char o, int fla){
+	if(a){
 		if(o == 'e'){		//pre order
 			if(a->c)
-				printf("\e[31m%d\e[0m ", a->v);
+				printf("\e[31m%d ", a->v);
 			else
-				printf("%d ", a->v);
-			printRB(a->l, o);
-			printRB(a->r, o);
+				printf("\e[0m%d ", a->v);
+			if(fla)
+				printf("|%9p||l:%9p||r:%9p||p:%9p|\n", (void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
+			printRB(a->l, o, fla);
+			printRB(a->r, o, fla);
 		}
 		else if(o == 'o'){	//post order
-			printRB(a->l, o);
-			printRB(a->r, o);
+			printRB(a->l, o, fla);
+			printRB(a->r, o, fla);
 			if(a->c)
-				printf("\e[31m%d\e[0m ", a->v);
+				printf("\e[31m%d ", a->v);
 			else
-				printf("%d ", a->v);
+				printf("\e[0m%d ", a->v);
+			if(fla)
+				printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 		}
 		else{			//in order
-			printRB(a->l, o);
+			printRB(a->l, o, fla);
 			if(a->c)
-				printf("\e[31m%d\e[0m ", a->v);
+				printf("\e[31m%d ", a->v);
 			else
-				printf("%d ", a->v);
-			printRB(a->r, o);
+				printf("\e[0m%d ", a->v);
+			if(fla)
+				printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
+			printRB(a->r, o, fla);
 		}
+	}
 }
 
 void inserBST(rb *a, rb *newn){
@@ -143,17 +151,27 @@ void inserBST(rb *a, rb *newn){
 }
 
 void rroteRB(rb **a){
-	rb *b = (*a)->l;
-	(*a)->l = b->r;
-	b->r = (*a);
-	*a = b;
+	if(*a){
+		rb *b = NULL;
+		b = (*a)->l;
+		b->p = (*a)->p;
+		(*a)->p = b;
+		(*a)->l = b->r;
+		b->r = (*a);
+		*a = b;
+	}
 }
 
 void lroteRB(rb **a){
-	rb *b = (*a)->r;
-	(*a)->r = b->l;
-	b->l = (*a);
-	*a = b;
+	if(*a){
+		rb *b = NULL;
+		b = (*a)->r;
+		b->p = (*a)->p;
+		(*a)->p = b;
+		(*a)->r = b->l;
+		b->l = (*a);
+		*a = b;
+	}
 }
 
 void inserRB(rb **a, int k){
@@ -170,35 +188,30 @@ void inserRB(rb **a, int k){
 	(*a)->c = 0;
 }
 
-void priall(rb *ward){
-	printRB(ward,'i');
+void priall(rb *ward, int fla){
+	printRB(ward,'i', fla);
 	printf("\n");
-	printRB(ward,'e');
+	printRB(ward,'e', fla);
 	printf("\n");
-	printRB(ward,'o');
+	printRB(ward,'o', fla);
 	printf("\n");
 }
 
 int main(){
+	time_t t;
+	srand((unsigned)time(&t));
 	rb *ward = NULL;
-	inserRB(&ward, 3);
-	inserRB(&ward, 1);
-	inserRB(&ward, 2);
-	inserRB(&ward, 5);
-	inserRB(&ward, 4);
-	printRB(ward,'i');
-	printf("\n");
-	printRB(ward,'e');
-	printf("\n");
-	printRB(ward,'o');
-	printf("\n");
-	rroteRB(ward->l);
-	printRB(ward,'i');
-	printf("\n");
-	printRB(ward,'e');
-	printf("\n");
-	printRB(ward,'o');
-	printf("\n");
+	int i = 0;
+	for(; i < 200; i++)
+		inserRB(&ward, rand()%1000);
+
+	priall(ward, 0);
+/*	lroteRB(&(ward->l));
+	priall(ward, 1);
+	rroteRB(&(ward->r));
+
+	priall(ward, 1);
+*/
 	desalRB(ward);
 	return 0;
 }
