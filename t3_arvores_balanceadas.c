@@ -15,15 +15,47 @@ void clearRB(rb *a){
 	a->p = NULL;
 }
 
-void predeRB(rb *a, int k){
-	if(minRB(a) < k){
+void pred2RB(rb *a, int k, int *pred){
+	if(!a) return;
+	if(a->v == k)
+		if(a->l)
+			pred = maxRB(a->l);
+	else if(a->v > k)
+		pred2RB(a->l, k, pre);
+	else{
+		pred = a->v;
+		pred2RB(a->r, k, pre);
+	}
+}
+
+void pred1RB(rb *a, int k){
+	if(minRB(a) > k){
+		int pred = -1;
+		pred2RB(a, k, &pred);
+		printf("%d\n", pred);
 	}
 	else
 		printf("erro\n");
 }
 
-void sucesRB(rb *a, int k){
+void succ2RB(rb *a, int k, int *succ){
+	if(!a) return;
+	if(a->v == k)
+		if(a->r)
+			succ = minRB(a->r);
+	else if(a->v > k){
+		succ = a->v;
+		succ2RB(a->l, k, succ);
+	}
+	else
+		succ2RB(a->r, k, succ);
+}
+
+void succ1RB(rb *a, int k){
 	if(maxRB(a) > k){
+		int succ = -1;
+		succ2RB(a, k, &succ);
+		printf("%d\n", succ);
 	}
 	else
 		printf("erro\n");
@@ -66,15 +98,23 @@ void desalRB(rb *a){
 }
 
 int maxRB(rb *a){
-	while(a->r)
-		a = a->r;
-	return a->v;
+	if(a){
+		while(a->r)
+			a = a->r;
+		return a->v;
+	}
+	else
+		return -1;
 }
 
 int minRB(rb *a){
-	while(a->l)
-		a = a->l;
-	return a->v;
+	if(a){
+		while(a->l)
+			a = a->l;
+		return a->v;
+	}
+	else
+		return -1;
 }
 
 void inserRB(rb **a, int k){
