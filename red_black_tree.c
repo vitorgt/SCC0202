@@ -1,0 +1,37 @@
+while(newn->p->c){
+	if(newn->p==newn->p->p->l){
+		y=newn->p->p->r;
+		if(y->c){
+			newn->p->c=0;
+			y->c=0;
+			newn->p->p->c=1;
+			newn=newn->p->p;
+		}
+		else{
+			if(newn==newn->p->r){
+				newn=newn->p;
+				lroteRB(tree,newn);
+			}
+			newn->p->c=0;
+			newn->p->p->c=1;
+			rroteRB(tree,newn->p->p);
+		}
+	}
+	else{
+		y=newn->p->p->l;
+		if(y->c){
+			newn->p->c=0;
+			y->c=0;
+			newn->p->p->c=1;
+			newn=newn->p->p;
+		}else{
+			if(newn==newn->p->l){
+				newn=newn->p;
+				rroteRB(tree,newn);
+			}
+			newn->p->c=0;
+			newn->p->p->c=1;
+			lroteRB(tree,newn->p->p);
+		}
+	}
+}
