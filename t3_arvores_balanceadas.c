@@ -7,7 +7,7 @@ typedef struct _rb{
 	struct _rb *l, *r, *p;//left, right, parent
 }rb;
 
-void clearrb(rb *a){
+void clearRB(rb *a){
 	a->v = 0;
 	a->c = 0;
 	a->l = NULL;
@@ -15,54 +15,71 @@ void clearrb(rb *a){
 	a->p = NULL;
 }
 
-void prederb(rb *a){
-	if(a->p)
-		printf("%d\n", a->p->v);
+void predeRB(rb *a, int k){
+	if(minRB(a) < k){
+	}
 	else
 		printf("erro\n");
 }
 
-void printrb(rb *a, char o){
-	if(o == 'i'){//in order
+void sucesRB(rb *a, int k){
+	if(maxRB(a) > k){
+	}
+	else
+		printf("erro\n");
+}
+
+void printRB(rb *a, char o){
+	if(o == 'i'){		//in order
 		if(a->l)
-			printrb(a->l, o);
+			printRB(a->l, o);
 		if(a)
 			printf("%d ", a->v);
 		if(a->r)
-			printrb(a->r, o);
+			printRB(a->r, o);
 	}
-	else if(o == 'e'){//pre order
+	else if(o == 'e'){	//pre order
 		if(a)
 			printf("%d ", a->v);
 		if(a->l)
-			printrb(a->l, o);
+			printRB(a->l, o);
 		if(a->r)
-			printrb(a->r, o);
+			printRB(a->r, o);
 	}
-	else if(o == 'o'){//post order
+	else if(o == 'o'){	//post order
 		if(a->l)
-			printrb(a->l, o);
+			printRB(a->l, o);
 		if(a->r)
-			printrb(a->r, o);
+			printRB(a->r, o);
 		if(a)
 			printf("%d ", a->v);
 	}
 }
 
-void desalrb(rb *a){
+void desalRB(rb *a){
 	if(a->l)
-		desalrb(a->l);
+		desalRB(a->l);
 	if(a->r)
-		desalrb(a->r);
+		desalRB(a->r);
 	if(a)
 		free(a);
 }
 
-void inserrb(rb **a, int k){
-	
+int maxRB(rb *a){
+	while(a->r)
+		a = a->r;
+	return a->v;
+}
+
+int minRB(rb *a){
+	while(a->l)
+		a = a->l;
+	return a->v;
+}
+
+void inserRB(rb **a, int k){
 }
 
 int main(){
-	
 	return 0;
 }
