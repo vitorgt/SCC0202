@@ -43,7 +43,7 @@ int minRB(rb *a){
 	else
 		return -1;
 }
-
+/*
 void pred2RB(rb *a, int k, int *pred){
 	if(!a) return;
 	if(a->v == k)
@@ -90,6 +90,51 @@ void succ1RB(rb *a, int k){
 	}
 	else
 		printf("erro\n");
+}
+*/
+
+void TreeSuccessor(rb* a){
+	rb* *b = NULL;
+	b = a->r;
+	if(b){
+		while(b->l)
+			b = b->l;
+		printf("%d\n", b->v);
+	}
+	else{
+		b = a->p;
+		while(a == b->r){
+			a = b;
+			b = b->p;
+		}
+		if(b->p == NULL){
+			printf("erro\n");
+			return;
+		}
+		printf("%d\n", b->v);
+	}
+}
+
+void TreePredecessor(rb* a){
+	rb* *b = NULL;
+	b = a->l;
+	if(b){
+		while(b->r)
+			b = b->r;
+		printf("%d\n", b->v);
+	}
+	else{
+		b = a->p;
+		while(a == b->l){
+			if(b->p == NULL){
+				printf("erro\n");
+				return;
+			}
+			a = b;
+			b = b->p;
+		}
+		printf("%d\n", b->v);
+	}
 }
 
 void printRB(rb *a, char o, int fla){
@@ -158,53 +203,73 @@ void inserBST(rb *a, rb *newn){
 		else
 			break;
 }
-
-void rroteRB(rb **b){
+/*
+void rroteRB(rb *b){
 	printf("\tRDEBUG\n");
 	printf("a");
-	printRB(*b,'i',1);
-	rb *a = (*b)->l;
-	(*b)->l = a->r;
+	printRB(b,'i',1);
+	rb *a = b->l;
+	b->l = a->r;
 	if(a->r)
-		a->r->p = (*b);
-	a->p = (*b)->p;
-	if((void*)((*b)->p)){
-		if(*b == (*b)->p->l)
-			(*b)->p->l = a;
-		else
-			(*b)->p->r = a;
-	}
-	a->r = (*b);
-	(*b)->p = a;
+		a->r->p = b;
+	a->p = b->p;
+	if(b == b->p->l)
+		b->p->l = a;
+	else
+		b->p->r = a;
+	a->r = b;
+	b->p = a;
 	printf("b");
-	printRB(*b,'i',1);
-	*b = a;
-	printf("c");
-	printRB(*b,'i',1);
+	printRB(b,'i',1);
 }
 
-void lroteRB(rb **a){
+void lroteRB(rb *a){
 	printf("\tLDEBUG\n");
 	printf("a");
-	printRB(*a,'i',1);
-	rb *b = (*a)->r;
-	(*a)->r = b->l;
+	printRB(a,'i',1);
+	rb *b = a->r;
+	a->r = b->l;
 	if(b->l)
-		b->l->p = (*a);
-	b->p = (*a)->p;
-	if((void*)((*a)->p)){
-		if(*a == (*a)->p->l)
-			(*a)->p->l = b;
-		else
-			(*a)->p->r = b;
-	}
-	b->l = (*a);
-	(*a)->p = b;
+		b->l->p = a;
+	b->p = a->p;
+	if(a == a->p->l)
+		a->p->l = b;
+	else
+		a->p->r = b;
+	b->l = a;
+	a->p = b;
 	printf("b");
-	printRB(*a,'i',1);
-	*a = b;
-	printf("c");
-	printRB(*a,'i',1);
+	printRB(a,'i',1);
+}
+*/
+void lroteRB(rb *x){
+	rb* y;
+	y = x->r;
+	x->r = y->l;
+	if(y->l)
+		y->l->p = x;
+	y->p = x->p;
+	if(x == x->p->l)
+		x->p->l = y;
+	else
+		x->p->r = y;
+	y->l = x;
+	x->p = y;
+}
+
+void rroteRB(rb* y){
+	rb* x;
+	x = y->l;
+	y->l = x->r;
+	if(x->r)
+		x->r->p = y;
+	x->p = y->p;
+	if(y == y->p->l)
+		y->p->l = x;
+	else
+		y->p->r = x;
+	x->r = y;
+	y->p = x;
 }
 
 void inserRB(rb **a, int k){
@@ -218,60 +283,13 @@ void inserRB(rb **a, int k){
 	else{
 		inserBST(*a, newn);
 		x = newn;
-		while(x->c){
-			printRB(*a,'i',1);
-			if(x && x->p && x->p->p){
-				if(x->p == x->p->p->l){
-					y = x->p->p->r;
-					if(y){
-						if(y->c){
-							x->p->c = 0;
-							y->c = 0;
-							x->p->p->c = 1;
-							x = x->p->p;
-						}
-						else{
-							if(x == x->p->r){
-								x = x->p;
-								lroteRB(&(x));
-							}
-							x->c = 0;
-							x->p->c = 1;
-							rroteRB(&(x->p));
-						}
-					}
-					else break;
-				}
-				else if(x->p == x->p->p->r){
-					y = x->p->p->l;
-					if(y){
-						if(y->c){
-							x->p->c = 0;
-							y->c = 0;
-							x->p->p->c = 1;
-							x = x->p->p;
-						}
-						else{
-							if(x == x->p->l){
-								x = x->p;
-								rroteRB(&(x));
-							}
-							x->c = 0;
-							x->p->c = 1;
-							lroteRB(&(x->p));
-						}
-					}
-					else break;
-				}
-				else break;
-			}
-			else break;
-		}
 		/*
 		   while(x->c){
-		   if(x->p->p){
+		   printRB(*a,'i',1);
+		   if(x && x->p && x->p->p){
 		   if(x->p == x->p->p->l){
 		   y = x->p->p->r;
+		   if(y){
 		   if(y->c){
 		   x->p->c = 0;
 		   y->c = 0;
@@ -279,12 +297,60 @@ void inserRB(rb **a, int k){
 		   x = x->p->p;
 		   }
 		   else{
+		   if(x == x->p->r){
+		   x = x->p;
+		   lroteRB(x);
 		   }
+		   x->c = 0;
+		   x->p->c = 1;
+		   rroteRB(x->p);
+		   }
+		   }
+		   else break;
+		   }
+		   else if(x->p == x->p->p->r){
+		   y = x->p->p->l;
+		   if(y){
+		   if(y->c){
+		   x->p->c = 0;
+		   y->c = 0;
+		   x->p->p->c = 1;
+		   x = x->p->p;
 		   }
 		   else{
+		   if(x == x->p->l){
+		   x = x->p;
+		   rroteRB(x);
+		   }
+		   x->c = 0;
+		   x->p->c = 1;
+		   lroteRB(x->p);
 		   }
 		   }
-		   }*/
+		   else break;
+		   }
+		   else break;
+		   }
+		   else break;
+		   }
+		/*
+		while(x->c){
+		if(x->p->p){
+		if(x->p == x->p->p->l){
+		y = x->p->p->r;
+		if(y->c){
+		x->p->c = 0;
+		y->c = 0;
+		x->p->p->c = 1;
+		x = x->p->p;
+		}
+		else{
+		}
+		}
+		else{
+		}
+		}
+		}*/
 	}
 	(*a)->c = 0;
 }
