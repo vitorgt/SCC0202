@@ -1,37 +1,50 @@
-while(newn->p->c){
-	if(newn->p==newn->p->p->l){
-		y=newn->p->p->r;
-		if(y->c){
-			newn->p->c=0;
-			y->c=0;
-			newn->p->p->c=1;
-			newn=newn->p->p;
+rb* inserRB(rb **ward, int v){
+	rb *y = NULL, *x = NULL, *newn = NULL;
+
+	x = (rb*)malloc(sizeof(rb));
+	x->k = v;
+
+	inserBST(ward, v);
+	newn = x;
+	x->c = 1;
+	while(x->p->c){
+		if(x->p == x->p->p->l){
+			y = x->p->p->r;
+			if(y->c){
+				x->p->c = 0;
+				y->c = 0;
+				x->p->p->c = 1;
+				x = x->p->p;
+			}
+			else{
+				if(x == x->p->r){
+					x = x->p;
+					lroteRB(tree,x);
+				}
+				x->p->c = 0;
+				x->p->p->c = 1;
+				rroteRB(tree,x->p->p);
+			}
 		}
 		else{
-			if(newn==newn->p->r){
-				newn=newn->p;
-				lroteRB(tree,newn);
+			y = x->p->p->l;
+			if(y->c){
+				x->p->c = 0;
+				y->c = 0;
+				x->p->p->c = 1;
+				x = x->p->p;
+			}else{
+				if(x == x->p->l){
+					x = x->p;
+					rroteRB(tree,x);
+				}
+				x->p->c = 0;
+				x->p->p->c = 1;
+				lroteRB(tree,x->p->p);
 			}
-			newn->p->c=0;
-			newn->p->p->c=1;
-			rroteRB(tree,newn->p->p);
 		}
 	}
-	else{
-		y=newn->p->p->l;
-		if(y->c){
-			newn->p->c=0;
-			y->c=0;
-			newn->p->p->c=1;
-			newn=newn->p->p;
-		}else{
-			if(newn==newn->p->l){
-				newn=newn->p;
-				rroteRB(tree,newn);
-			}
-			newn->p->c=0;
-			newn->p->p->c=1;
-			lroteRB(tree,newn->p->p);
-		}
-	}
+	(*ward)->l->c = 0;
+	return(newn);
+
 }
