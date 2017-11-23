@@ -96,9 +96,9 @@ void printRB(rb *a, char o, int fla){
 	if(a){
 		if(o == 'e'){		//pre order
 			if(a->c)
-				printf("\e[31m%d ", a->v);
+				printf("\e[31m%3d ", a->v);
 			else
-				printf("\e[0m%d ", a->v);
+				printf("\e[0m%3d ", a->v);
 			if(fla)
 				printf("|%9p||l:%9p||r:%9p||p:%9p|\n", (void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 			printRB(a->l, o, fla);
@@ -108,23 +108,33 @@ void printRB(rb *a, char o, int fla){
 			printRB(a->l, o, fla);
 			printRB(a->r, o, fla);
 			if(a->c)
-				printf("\e[31m%d ", a->v);
+				printf("\e[31m%3d ", a->v);
 			else
-				printf("\e[0m%d ", a->v);
+				printf("\e[0m%3d ", a->v);
 			if(fla)
 				printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 		}
 		else{			//in order
 			printRB(a->l, o, fla);
 			if(a->c)
-				printf("\e[31m%d ", a->v);
+				printf("\e[31m%3d ", a->v);
 			else
-				printf("\e[0m%d ", a->v);
+				printf("\e[0m%3d ", a->v);
 			if(fla)
 				printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 			printRB(a->r, o, fla);
 		}
 	}
+}
+
+void priall(rb *ward, int fla){
+	printRB(ward,'i', fla);
+	printf("\n");
+	printf("\n");/*
+			printRB(ward,'e', fla);
+			printf("\n");
+			printRB(ward,'o', fla);
+			printf("\n");*/
 }
 
 void inserBST(rb *a, rb *newn){
@@ -150,32 +160,48 @@ void inserBST(rb *a, rb *newn){
 			break;
 }
 
-void rroteRB(rb **a){
-	if(*a){
-		rb *b = NULL;
-		b = (*a)->l;
-		b->p = (*a)->p;
-		(*a)->p = b;
-		(*a)->l = b->r;
-		b->r = (*a);
-		*a = b;
+void rroteRB(rb **b){
+	printf("\tRDEBUG\n");
+	printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)(*b),(void*)(*b)->l,(void*)(*b)->r,(void*)(*b)->p);
+	rb *a = (*b)->l;
+	(*b)->l = a->r;
+	if(a->r)
+		a->r->p = (*b);
+	a->p = (*b)->p;
+	if((*b)->p){
+		if(*b == (*b)->p->l)
+			(*b)->p->l = a;
+		else
+			(*b)->p->r = a;
 	}
+	a->r = (*b);
+	(*b)->p = a;
+	*b = a;
+	printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)(*b),(void*)(*b)->l,(void*)(*b)->r,(void*)(*b)->p);
 }
 
 void lroteRB(rb **a){
-	if(*a){
-		rb *b = NULL;
-		b = (*a)->r;
-		b->p = (*a)->p;
-		(*a)->p = b;
-		(*a)->r = b->l;
-		b->l = (*a);
-		*a = b;
+	printf("\tLDEBUG\n");
+	printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)(*a),(void*)(*a)->l,(void*)(*a)->r,(void*)(*a)->p);
+	rb *b = (*a)->r;
+	(*a)->r = b->l;
+	if(b->l)
+		b->l->p = (*a);
+	b->p = (*a)->p;
+	if((*a)->p){
+		if(*a == (*a)->p->l)
+			(*a)->p->l = b;
+		else
+			(*a)->p->r = b;
 	}
+	b->l = (*a);
+	(*a)->p = b;
+	*a = b;
+	printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)(*a),(void*)(*a)->l,(void*)(*a)->r,(void*)(*a)->p);
 }
 
 void inserRB(rb **a, int k){
-	rb *newn = NULL;//, *s = *a;
+	rb *newn = NULL, *x = NULL, *y = NULL;
 	newn = (rb *)malloc(sizeof(rb));
 	clearRB(newn);
 	newn->v = k;
@@ -184,17 +210,75 @@ void inserRB(rb **a, int k){
 		*a = newn;
 	else{
 		inserBST(*a, newn);
+		x = newn;
+		while(x->c){
+			priall(*a, 1);
+			if(x && x->p && x->p->p){
+				if(x->p == x->p->p->l){
+					y = x->p->p->r;
+					if(y){
+						if(y->c){
+							x->p->c = 0;
+							y->c = 0;
+							x->p->p->c = 1;
+							x = x->p->p;
+						}
+						else{
+							if(x == x->p->r){
+								x = x->p;
+								lroteRB(&(x));
+							}
+							x->c = 0;
+							x->p->c = 1;
+							rroteRB(&(x->p));
+						}
+					}
+					else break;
+				}
+				else{
+					y = x->p->p->l;
+					if(y){
+						if(y->c){
+							x->p->c = 0;
+							y->c = 0;
+							x->p->p->c = 1;
+							x = x->p->p;
+						}
+						else{
+							if(x == x->p->l){
+								x = x->p;
+								rroteRB(&(x));
+							}
+							x->c = 0;
+							x->p->c = 1;
+							lroteRB(&(x->p));
+						}
+					}
+					else break;
+				}
+			}
+			else break;
+		}
+		/*
+		   while(x->c){
+		   if(x->p->p){
+		   if(x->p == x->p->p->l){
+		   y = x->p->p->r;
+		   if(y->c){
+		   x->p->c = 0;
+		   y->c = 0;
+		   x->p->p->c = 1;
+		   x = x->p->p;
+		   }
+		   else{
+		   }
+		   }
+		   else{
+		   }
+		   }
+		   }*/
 	}
 	(*a)->c = 0;
-}
-
-void priall(rb *ward, int fla){
-	printRB(ward,'i', fla);
-	printf("\n");
-	printRB(ward,'e', fla);
-	printf("\n");
-	printRB(ward,'o', fla);
-	printf("\n");
 }
 
 int main(){
@@ -202,16 +286,21 @@ int main(){
 	srand((unsigned)time(&t));
 	rb *ward = NULL;
 	int i = 0;
+		inserRB(&ward, 276);
+		inserRB(&ward, 781);
+		inserRB(&ward, 142);
+		inserRB(&ward, 785);
+		inserRB(&ward, 290);
 	for(; i < 200; i++)
 		inserRB(&ward, rand()%1000);
 
 	priall(ward, 0);
-/*	lroteRB(&(ward->l));
-	priall(ward, 1);
-	rroteRB(&(ward->r));
+	/*	lroteRB(&(ward->l));
+		priall(ward, 1);
+		rroteRB(&(ward->r));
 
-	priall(ward, 1);
-*/
+		priall(ward, 1);
+	 */
 	desalRB(ward);
 	return 0;
 }
