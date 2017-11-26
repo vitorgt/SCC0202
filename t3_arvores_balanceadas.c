@@ -8,6 +8,8 @@ typedef struct _rb{
 	struct _rb *l, *r, *p;//left, right, parent
 }rb;
 
+void repaiRB(rb *, rb *);
+
 void clearRB(rb *a){
 	a->v = 0;
 	a->c = 0;
@@ -22,6 +24,18 @@ void desalRB(rb *a){
 		desalRB(a->r);
 		free(a);
 	}
+}
+
+rb *uncleRB(rb *x){
+	if(x)
+		if(x->p)
+			if(x->p->p){
+				if(x->p == x->p->p->l)
+					return x->p->p->r;
+				else
+					return x->p->p->l;
+			}
+	return NULL;
 }
 
 int maxRB(rb *a){
@@ -43,64 +57,12 @@ int minRB(rb *a){
 	else
 		return -1;
 }
-/*
-void pred2RB(rb *a, int k, int *pred){
-	if(!a) return;
-	if(a->v == k)
-		if(a->l)
-			*pred = maxRB(a->l);
-		else return;
-	else if(a->v > k)
-		pred2RB(a->l, k, pred);
-	else{
-		*pred = a->v;
-		pred2RB(a->r, k, pred);
-	}
-}
 
-void pred1RB(rb *a, int k){
-	if(minRB(a) > k){
-		int pred = -1;
-		pred2RB(a, k, &pred);
-		printf("%d\n", pred);
-	}
-	else
-		printf("erro\n");
-}
-
-void succ2RB(rb *a, int k, int *succ){
-	if(!a) return;
-	if(a->v == k)
-		if(a->r)
-			*succ = minRB(a->r);
-		else return;
-	else if(a->v > k){
-		*succ = a->v;
-		succ2RB(a->l, k, succ);
-	}
-	else
-		succ2RB(a->r, k, succ);
-}
-
-void succ1RB(rb *a, int k){
-	if(maxRB(a) > k){
-		int succ = -1;
-		succ2RB(a, k, &succ);
-		printf("%d\n", succ);
-	}
-	else
-		printf("erro\n");
-}
-*/
-
-void TreeSuccessor(rb* a){
-	rb* *b = NULL;
+void succeRB(rb* a){
+	rb *b = NULL;
 	b = a->r;
-	if(b){
-		while(b->l)
-			b = b->l;
-		printf("%d\n", b->v);
-	}
+	if(b)
+		printf("%d\n", minRB(b));
 	else{
 		b = a->p;
 		while(a == b->r){
@@ -115,14 +77,11 @@ void TreeSuccessor(rb* a){
 	}
 }
 
-void TreePredecessor(rb* a){
-	rb* *b = NULL;
+void predeRB(rb* a){
+	rb *b = NULL;
 	b = a->l;
-	if(b){
-		while(b->r)
-			b = b->r;
-		printf("%d\n", b->v);
-	}
+	if(b)
+		printf("%d\n", maxRB(b));
 	else{
 		b = a->p;
 		while(a == b->l){
@@ -145,7 +104,7 @@ void printRB(rb *a, char o, int fla){
 			else
 				printf("\e[0m%3d ", a->v);
 			if(fla)
-				printf("|%9p||l:%9p||r:%9p||p:%9p|\n", (void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
+				printf("|%9p||l:%9p||r:%9p||p:%9p|\e[0m\n", (void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 			printRB(a->l, o, fla);
 			printRB(a->r, o, fla);
 		}
@@ -157,7 +116,7 @@ void printRB(rb *a, char o, int fla){
 			else
 				printf("\e[0m%3d ", a->v);
 			if(fla)
-				printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
+				printf("|%9p||l:%9p||r:%9p||p:%9p|\e[0m\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 		}
 		else{			//in order
 			printRB(a->l, o, fla);
@@ -166,7 +125,7 @@ void printRB(rb *a, char o, int fla){
 			else
 				printf("\e[0m%3d ", a->v);
 			if(fla)
-				printf("|%9p||l:%9p||r:%9p||p:%9p|\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
+				printf("|%9p||l:%9p||r:%9p||p:%9p|\e[0m\n",(void*)a,(void*)a->l,(void*)a->r,(void*)a->p);
 			printRB(a->r, o, fla);
 		}
 	}
@@ -175,10 +134,10 @@ void printRB(rb *a, char o, int fla){
 void priall(rb *ward, int fla){
 	printRB(ward,'i', fla);
 	printf("\n");
-	printRB(ward,'e', fla);
-	printf("\n");
-	printRB(ward,'o', fla);
-	printf("\n");
+	//printRB(ward,'e', fla);
+	//printf("\n");
+	//printRB(ward,'o', fla);
+	//printf("\n");
 }
 
 void inserBST(rb *a, rb *newn){
@@ -203,77 +162,38 @@ void inserBST(rb *a, rb *newn){
 		else
 			break;
 }
-/*
-void rroteRB(rb *b){
-	printf("\tRDEBUG\n");
-	printf("a");
-	printRB(b,'i',1);
-	rb *a = b->l;
-	b->l = a->r;
-	if(a->r)
-		a->r->p = b;
-	a->p = b->p;
-	if(b == b->p->l)
-		b->p->l = a;
-	else
-		b->p->r = a;
-	a->r = b;
-	b->p = a;
-	printf("b");
-	printRB(b,'i',1);
-}
 
-void lroteRB(rb *a){
-	printf("\tLDEBUG\n");
-	printf("a");
-	printRB(a,'i',1);
-	rb *b = a->r;
-	a->r = b->l;
-	if(b->l)
-		b->l->p = a;
-	b->p = a->p;
-	if(a == a->p->l)
-		a->p->l = b;
-	else
-		a->p->r = b;
-	b->l = a;
-	a->p = b;
-	printf("b");
-	printRB(a,'i',1);
-}
-*/
 void lroteRB(rb *x){
-	rb* y;
-	y = x->r;
+	rb *y = x->r;
 	x->r = y->l;
-	if(y->l)
-		y->l->p = x;
-	y->p = x->p;
-	if(x == x->p->l)
-		x->p->l = y;
-	else
-		x->p->r = y;
 	y->l = x;
+	y->p = x->p;
 	x->p = y;
+	if(y->p){
+		if(x == y->p->l)
+			y->p->l = y;
+		else
+			y->p->r = y;
+	}
 }
 
-void rroteRB(rb* y){
-	rb* x;
-	x = y->l;
-	y->l = x->r;
-	if(x->r)
-		x->r->p = y;
-	x->p = y->p;
-	if(y == y->p->l)
-		y->p->l = x;
-	else
-		y->p->r = x;
-	x->r = y;
-	y->p = x;
+void rroteRB(rb* x){
+	rb *y = x->l;
+	x->l = y->r;
+	y->r = x;
+	y->p = x->p;
+	x->p = y;
+	if(y->p){
+		if(x == y->p->l)
+			y->p->l = y;
+		else
+			y->p->r = y;
+	}
 }
 
 void inserRB(rb **a, int k){
-	rb *newn = NULL, *x = NULL, *y = NULL;
+	printf("\tinserindo %d\n", k);
+	rb *newn = NULL;
 	newn = (rb *)malloc(sizeof(rb));
 	clearRB(newn);
 	newn->v = k;
@@ -282,77 +202,63 @@ void inserRB(rb **a, int k){
 		*a = newn;
 	else{
 		inserBST(*a, newn);
-		x = newn;
-		/*
-		   while(x->c){
-		   printRB(*a,'i',1);
-		   if(x && x->p && x->p->p){
-		   if(x->p == x->p->p->l){
-		   y = x->p->p->r;
-		   if(y){
-		   if(y->c){
-		   x->p->c = 0;
-		   y->c = 0;
-		   x->p->p->c = 1;
-		   x = x->p->p;
-		   }
-		   else{
-		   if(x == x->p->r){
-		   x = x->p;
-		   lroteRB(x);
-		   }
-		   x->c = 0;
-		   x->p->c = 1;
-		   rroteRB(x->p);
-		   }
-		   }
-		   else break;
-		   }
-		   else if(x->p == x->p->p->r){
-		   y = x->p->p->l;
-		   if(y){
-		   if(y->c){
-		   x->p->c = 0;
-		   y->c = 0;
-		   x->p->p->c = 1;
-		   x = x->p->p;
-		   }
-		   else{
-		   if(x == x->p->l){
-		   x = x->p;
-		   rroteRB(x);
-		   }
-		   x->c = 0;
-		   x->p->c = 1;
-		   lroteRB(x->p);
-		   }
-		   }
-		   else break;
-		   }
-		   else break;
-		   }
-		   else break;
-		   }
-		/*
-		while(x->c){
-		if(x->p->p){
-		if(x->p == x->p->p->l){
-		y = x->p->p->r;
-		if(y->c){
-		x->p->c = 0;
-		y->c = 0;
-		x->p->p->c = 1;
-		x = x->p->p;
-		}
-		else{
-		}
-		}
-		else{
-		}
-		}
-		}*/
+		priall(*a, 1);
+		repaiRB(newn, *a);
 	}
+	while((*a)->p)
+		(*a) = (*a)->p;
 	(*a)->c = 0;
+	priall(*a, 1);
+}
+
+void fixr3RB(rb *x, rb *u, rb *a){
+	x->p->c = 0;
+	u->c = 0;
+	x->p->p->c = 1;
+	repaiRB(x->p->p, a);
+}
+
+void fixr4RB(rb *x, rb *p, rb *g, rb *a){
+	int flag = 1;
+	if(g->l)
+		if(x == g->l->r){
+			lroteRB(p);
+			x = x->l;
+			flag = 0;
+		}
+	if(g->r && flag)
+		if(x == g->r->l){
+			rroteRB(p);
+			x = x->r;
+		}
+
+	if(x == p->l)
+		rroteRB(g);
+	else
+		lroteRB(g);
+	p->c = 0;
+	g->c = 1;
+}
+
+void repaiRB(rb *x, rb *a){
+	printf("\treparando %d\n", x->v);
+	priall(a, 1);
+	if(!(x->p))
+		x->c = 0;
+	else if(!(x->p->c))
+		return;//se o pai for negro nao ha problema
+	else if(x->p->p){//se tem avo
+		rb *u = uncleRB(x);
+		if(u){//se tem tio
+			if(u->c)//se o tio for vermelho
+				fixr3RB(x, u, a);
+			else
+				fixr4RB(x, x->p, x->p->p, a);
+		}
+		else if(x->p->c)
+			fixr4RB(x, x->p, x->p->p, a);
+	}
+	priall(a, 1);
 }
 
 int main(){
@@ -365,10 +271,15 @@ int main(){
 	inserRB(&ward, 142);
 	inserRB(&ward, 785);
 	inserRB(&ward, 290);
-	for(; i < 200; i++)
+	inserRB(&ward, 329);
+	inserRB(&ward, 931);
+	inserRB(&ward, 719);
+	inserRB(&ward, 494);
+	inserRB(&ward, 451);
+	//for(; i < 200; i++)
 		inserRB(&ward, rand()%1000);
-
 	priall(ward, 0);
 	desalRB(ward);
+	printf("\e[0m ");
 	return 0;
 }
