@@ -132,8 +132,8 @@ void printRB(rb *a, char o, int fla){
 }
 
 void priall(rb *ward, int fla){
-	printRB(ward,'i', fla);
-	printf("\n");
+	//printRB(ward,'i', fla);
+	//printf("\n");
 	//printRB(ward,'e', fla);
 	//printf("\n");
 	//printRB(ward,'o', fla);
@@ -163,36 +163,97 @@ void inserBST(rb *a, rb *newn){
 			break;
 }
 
-void lroteRB(rb *x){
+void lroteRB(rb *x, rb **a){
 	rb *y = x->r;
 	x->r = y->l;
-	y->l = x;
+	if(y->l)
+		y->l->p = x;
 	y->p = x->p;
+	if(!(x->p))
+		*a = y;
+	else if(x == x->p->l)
+		x->p->l = y;
+	else
+		x->p->r = y;
+	y->l = x;
 	x->p = y;
-	if(y->p){
-		if(x == y->p->l)
-			y->p->l = y;
-		else
-			y->p->r = y;
-	}
 }
 
-void rroteRB(rb* x){
+void rroteRB(rb* x, rb **a){
 	rb *y = x->l;
 	x->l = y->r;
-	y->r = x;
+	if(y->r)
+		y->r->p = x;
 	y->p = x->p;
+	if(!(x->p))	
+		*a = y;
+	else if(x == x->p->l)
+		x->p->l = y;
+	else
+		x->p->r = y;
+	y->r = x;
 	x->p = y;
-	if(y->p){
-		if(x == y->p->l)
-			y->p->l = y;
+}
+
+void fixupRB(rb *z, rb **a){
+	while(z->p){
+		if(z->p->c){
+			rb *y = NULL;
+			if(z->p->p){
+				if(z->p == z->p->p->l){
+					y = z->p->p->r;
+					if(y && y->c){
+						z->p->c = 0;
+						y->c = 0;
+						z->p->p->c = 1;
+						z = z->p->p;
+					}
+					else if(z == z->p->r){
+						z = z->p;
+						lroteRB(z, a);
+						z->p->c = 0;
+						z->p->p->c = 1;
+						rroteRB(z->p->p, a);
+					}
+					else{
+						z->p->c = 0;
+						z->p->p->c = 1;
+						rroteRB(z->p->p, a);
+					}
+				}
+				else{
+					y = z->p->p->l;
+					if(y && y->c){
+						z->p->c = 0;
+						y->c = 0;
+						z->p->p->c = 1;
+						z = z->p->p;
+					}
+					else if(z == z->p->l){
+						z = z->p;
+						rroteRB(z, a);
+						z->p->c = 0;
+						z->p->p->c = 1;
+						lroteRB(z->p->p, a);
+					}
+					else{
+						z->p->c = 0;
+						z->p->p->c = 1;
+						lroteRB(z->p->p, a);
+					}
+				}
+			}
+			else
+				break;
+		}
 		else
-			y->p->r = y;
+			break;
 	}
+	(*a)->c = 0;
 }
 
 void inserRB(rb **a, int k){
-	printf("\tinserindo %d\n", k);
+	//printf("\tinserindo %d\n", k);
 	rb *newn = NULL;
 	newn = (rb *)malloc(sizeof(rb));
 	clearRB(newn);
@@ -203,7 +264,8 @@ void inserRB(rb **a, int k){
 	else{
 		inserBST(*a, newn);
 		priall(*a, 1);
-		repaiRB(newn, *a);
+		//repaiRB(newn, *a);
+		fixupRB(newn, a);
 	}
 	while((*a)->p)
 		(*a) = (*a)->p;
@@ -222,20 +284,20 @@ void fixr4RB(rb *x, rb *p, rb *g, rb *a){
 	int flag = 1;
 	if(g->l)
 		if(x == g->l->r){
-			lroteRB(p);
+			//lroteRB(p);
 			x = x->l;
 			flag = 0;
 		}
 	if(g->r && flag)
 		if(x == g->r->l){
-			rroteRB(p);
+			//rroteRB(p);
 			x = x->r;
 		}
 
-	if(x == p->l)
-		rroteRB(g);
-	else
-		lroteRB(g);
+	if(x == p->l){}
+	//rroteRB(g);
+	else{}
+	//lroteRB(g);
 	p->c = 0;
 	g->c = 1;
 }
@@ -276,10 +338,10 @@ int main(){
 	inserRB(&ward, 719);
 	inserRB(&ward, 494);
 	inserRB(&ward, 451);
-	//for(; i < 200; i++)
-		inserRB(&ward, rand()%1000);
+	for(; i < 200000; i++)
+		inserRB(&ward, rand()%100000);
 	priall(ward, 0);
+	printRB(ward, 'i', 0);
 	desalRB(ward);
-	printf("\e[0m ");
 	return 0;
 }
