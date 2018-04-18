@@ -1,5 +1,5 @@
-# SCC0202
-Algorithms and Data Structures I
+# Algorithms and Data Structures I
+SCC0202
 
 Institute of Mathematical and Computer Sciences
 
