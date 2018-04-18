@@ -1,5 +1,5 @@
 # Algorithms and Data Structures I
-SCC0202
+[SCC0202](https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=SCC0202)
 
 Institute of Mathematical and Computer Sciences
 
